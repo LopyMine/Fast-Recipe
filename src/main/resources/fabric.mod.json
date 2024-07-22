@@ -16,23 +16,18 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "net.lopymine.mossy.Mossy"
+	        "net.lopymine.fs.FastRecipe"
         ],
         "client": [
-            "net.lopymine.mossy.client.MossyClient"
-        ],
-        "modmenu": [
-            "net.lopymine.mossy.modmenu.ModMenuIntegration"
+	        "net.lopymine.fs.client.FastRecipeClient"
         ]
     },
     "depends": {
         "fabricloader": ">=${fabric_loader}",
         "minecraft": ">=${minecraft}",
-        "java": ">=${java}",
-        "fabric-api": ">=${fabric_api}"
+        "java": ">=${java}"
     },
-    "accessWidener": "aws/${minecraft}.accesswidener",
     "mixins": [
-        "mixins/${minecraft}-${mod_id}.mixins.json"
+        "${mod_id}.mixins.json"
     ]
 }
