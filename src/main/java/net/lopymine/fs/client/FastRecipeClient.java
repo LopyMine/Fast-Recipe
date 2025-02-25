@@ -8,12 +8,14 @@ import net.minecraft.client.network.*;
 import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.*;
+import org.slf4j.*;
 
 import net.fabricmc.api.ClientModInitializer;
 
 import net.lopymine.fs.FastRecipe;
 import net.lopymine.fs.slot.SlotListener;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public class FastRecipeClient implements ClientModInitializer {
@@ -21,16 +23,18 @@ public class FastRecipeClient implements ClientModInitializer {
 	@Setter
 	@Getter
 	@Nullable
-	private static Item waitingResult;
+	private static List<Item> waitingResult;
+
+	public static final Logger LOGGER = LoggerFactory.getLogger("Fast Recipe Client");
 
 	public static SlotListener getSlotListener() {
 		return (slot) -> {
-			Item waitingResult = FastRecipeClient.getWaitingResult();
+			List<Item> waitingResult = FastRecipeClient.getWaitingResult();
 			if (waitingResult == null) {
 				return;
 			}
 			ItemStack stack = slot.getStack();
-			if (stack == null || stack.isEmpty() || stack.getItem() != waitingResult) {
+			if (stack == null || stack.isEmpty() || !waitingResult.contains(stack.getItem())) {
 				return;
 			}
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -53,19 +57,22 @@ public class FastRecipeClient implements ClientModInitializer {
 		};
 	}
 
-	public static boolean canStartWaiting(Item waitingResult) {
+	public static boolean canStartWaiting(List<Item> waitingResult) {
 		Screen currentScreen = MinecraftClient.getInstance().currentScreen;
 		if (!(currentScreen instanceof InventoryScreen || currentScreen instanceof CraftingScreen)) {
 			return false;
 		}
 		HandledScreen<?> handledScreen = (HandledScreen<?>) currentScreen;
 		ScreenHandler screenHandler = handledScreen.getScreenHandler();
+		if (!(screenHandler instanceof AbstractRecipeScreenHandler)) {
+			return false;
+		}
 		Slot slot = screenHandler.getSlot(0);
-		return slot != null && slot.getStack().getItem() != waitingResult;
+		return slot != null && !waitingResult.contains(slot.getStack().getItem());
 	}
 
 	@Override
 	public void onInitializeClient() {
-		System.out.println(FastRecipe.MOD_NAME + " Client Initialized");
+		LOGGER.info(FastRecipe.MOD_NAME + " Client Initialized");
 	}
 }

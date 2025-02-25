@@ -1,13 +1,20 @@
 package net.lopymine.fs.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.recipebook.*;
+import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection.RecipeFilterMode;
 import net.minecraft.item.*;
+import net.minecraft.recipe.RecipeDisplayEntry;
+import net.minecraft.recipe.display.*;
+import net.minecraft.util.context.ContextParameterMap;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.lopymine.fs.client.FastRecipeClient;
+
+import java.util.*;
 
 @Mixin(RecipeBookWidget.class)
 public class RecipeBookWidgetMixin {
@@ -16,9 +23,17 @@ public class RecipeBookWidgetMixin {
 
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/recipebook/RecipeBookWidget;isWide()Z"), method = "mouseClicked")
 	private void init(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+
 		RecipeResultCollection lastClickedResults = this.recipesArea.getLastClickedResults();
-		/*? >=1.20.2 {*/ net.minecraft.recipe.RecipeEntry<?> /*?} else {*/ /*net.minecraft.recipe.Recipe<?> *//*?}*/
-		lastClickedRecipe = this.recipesArea.getLastClickedRecipe();
+
+		//? if >=1.21.2 {
+		net.minecraft.recipe.NetworkRecipeId
+		//?} elif >=1.20.2 {
+		/*net.minecraft.recipe.RecipeEntry
+		*///?} else {
+		/*net.minecraft.recipe.Recipe<?>
+		*///?}
+				lastClickedRecipe = this.recipesArea.getLastClickedRecipe();
 
 		if (lastClickedResults == null) {
 			return;
@@ -26,19 +41,29 @@ public class RecipeBookWidgetMixin {
 		if (lastClickedRecipe == null) {
 			return;
 		}
-		//? >=1.20.2 {
-		ItemStack result = lastClickedRecipe.value().getResult(lastClickedResults.getRegistryManager());
-		//?} else {
-		/*ItemStack result = lastClickedRecipe.getOutput(/^? >=1.19.4 {^/ /^lastClickedResults.getRegistryManager() ^//^?}^/);
+
+		//? if >=1.21.2 {
+		ContextParameterMap parameters = SlotDisplayContexts.createParameters(Objects.requireNonNull(MinecraftClient.getInstance().world));
+		List<Item> result = lastClickedResults.filter(RecipeFilterMode.CRAFTABLE)
+				.stream()
+				.map(RecipeDisplayEntry::display)
+				.map(RecipeDisplay::result)
+				.map((slotDisplay) -> slotDisplay.getStacks(parameters))
+				.flatMap(List::stream)
+				.map(ItemStack::getItem)
+				.toList();
+		//?} elif >=1.20.2 {
+		/*ItemStack result = List.of(lastClickedRecipe.value().getResult(lastClickedResults.getRegistryManager()).getItem());
+		*///?} else {
+		/*ItemStack result = List.of(lastClickedRecipe.getOutput(/^? >=1.19.4 {^/ /^lastClickedResults.getRegistryManager() ^//^?}^/).getItem());
 		*///?}
 
-		if (result == null || result.isEmpty()) {
+		if (result.isEmpty()) {
 			return;
 		}
-		Item item = result.getItem();
-		if (!Screen.hasControlDown() || !FastRecipeClient.canStartWaiting(item)) {
+		if (!Screen.hasControlDown() || !FastRecipeClient.canStartWaiting(result)) {
 			return;
 		}
-		FastRecipeClient.setWaitingResult(item);
+		FastRecipeClient.setWaitingResult(result);
 	}
 }

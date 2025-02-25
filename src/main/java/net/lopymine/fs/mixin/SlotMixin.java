@@ -18,15 +18,6 @@ public class SlotMixin implements ListenableSlot {
 		this.listener = listener;
 	}
 
-	//? <1.19 {
-	/*@Inject(at = @At("TAIL"), method = "setStack*")
-	private void setStack(CallbackInfo ci) {
-		if (this.listener == null) {
-			return;
-		}
-		this.listener.trigger((Slot) (Object) this);
-	}
-	*///?} else {
 	@Inject(at = @At("TAIL"), method = "setStackNoCallbacks")
 	private void setStackNoCallbacks(CallbackInfo ci) {
 		if (this.listener == null) {
@@ -34,5 +25,5 @@ public class SlotMixin implements ListenableSlot {
 		}
 		this.listener.trigger((Slot) (Object) this);
 	}
-	//?}
+
 }

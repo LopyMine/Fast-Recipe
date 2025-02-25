@@ -1,18 +1,17 @@
 {
-    "required": true,
-    "package": "net.lopymine.fs.mixin",
-    "refmap": "${mod_id}.refmap.json",
-    "compatibilityLevel": "JAVA_${java}",
-    "mixins": [
-        
-    ],
-    "client": [
-        "CraftingScreenHandlerMixin",
-	    "PlayerScreenHandlerMixin",
-	    "RecipeBookWidgetMixin",
-	    "SlotMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+	"required": true,
+	"package": "net.lopymine.fs.mixin",
+	"refmap": "${mod_id}.refmap.json",
+	"compatibilityLevel": "JAVA_${java}",
+	"mixins": [
+
+	],
+	"client": [
+		"ScreenHandlerMixin",
+		"RecipeBookWidgetMixin",
+		"SlotMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }
