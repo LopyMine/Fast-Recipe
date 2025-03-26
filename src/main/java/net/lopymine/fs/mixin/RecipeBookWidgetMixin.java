@@ -3,11 +3,7 @@ package net.lopymine.fs.mixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.recipebook.*;
-import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection.RecipeFilterMode;
 import net.minecraft.item.*;
-import net.minecraft.recipe.RecipeDisplayEntry;
-import net.minecraft.recipe.display.*;
-import net.minecraft.util.context.ContextParameterMap;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -43,19 +39,19 @@ public class RecipeBookWidgetMixin {
 		}
 
 		//? if >=1.21.2 {
-		ContextParameterMap parameters = SlotDisplayContexts.createParameters(Objects.requireNonNull(MinecraftClient.getInstance().world));
-		List<Item> result = lastClickedResults.filter(RecipeFilterMode.CRAFTABLE)
+		net.minecraft.util.context.ContextParameterMap parameters = net.minecraft.recipe.display.SlotDisplayContexts.createParameters(Objects.requireNonNull(MinecraftClient.getInstance().world));
+		List<Item> result = lastClickedResults.filter(net.minecraft.client.gui.screen.recipebook.RecipeResultCollection.RecipeFilterMode.CRAFTABLE)
 				.stream()
-				.map(RecipeDisplayEntry::display)
-				.map(RecipeDisplay::result)
+				.map(net.minecraft.recipe.RecipeDisplayEntry::display)
+				.map(net.minecraft.recipe.display.RecipeDisplay::result)
 				.map((slotDisplay) -> slotDisplay.getStacks(parameters))
 				.flatMap(List::stream)
 				.map(ItemStack::getItem)
 				.toList();
 		//?} elif >=1.20.2 {
-		/*ItemStack result = List.of(lastClickedRecipe.value().getResult(lastClickedResults.getRegistryManager()).getItem());
+		/*List<Item> result = List.of(lastClickedRecipe.value().getResult(lastClickedResults.getRegistryManager()).getItem());
 		*///?} else {
-		/*ItemStack result = List.of(lastClickedRecipe.getOutput(/^? >=1.19.4 {^/ /^lastClickedResults.getRegistryManager() ^//^?}^/).getItem());
+		/*List<Item> result = List.of(lastClickedRecipe.getOutput(/^? >=1.19.4 {^/ /^lastClickedResults.getRegistryManager() ^//^?}^/).getItem());
 		*///?}
 
 		if (result.isEmpty()) {

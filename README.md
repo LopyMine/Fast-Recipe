@@ -6,8 +6,3 @@
 ### Description
 ![Decoration Light](img/separator_sprite.png)
 Fast Recipe — Simple Client-Side Fabric mod which adds CTRL + LMB hotkey to recipe book. Use it for instantly crafting, according to clicked recipe.
-
-### FAQ
-![Decoration Light](img/separator_sprite.png)
-*Can I upload this mod somewhere?*
-- Nope, only mod authors can upload this mod on other sites.
